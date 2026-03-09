@@ -16,6 +16,7 @@ import { getValueFor } from "@/lib/storage";
 
 export default function StudyDetailScreen() {
   const local = useLocalSearchParams();
+  const studyId = local.id;
   const [displayedWidth, setDisplayedWidth] = useState(0);
   const [displayedHeight, setDisplayedHeight] = useState(0);
 
@@ -28,7 +29,7 @@ export default function StudyDetailScreen() {
     const fetchData = async () => {
       const storedData = await getValueFor(NON_CUSTOMER_FLASH_CARD_KEY);
       const images: TImage[] = storedData ? JSON.parse(storedData) : [];
-      const image = images.find((img) => img.id === Number(local.id)) ?? {
+      const image = images.find((img) => img.id === Number(studyId)) ?? {
         id: 0,
         uri: "",
         masks: [],
@@ -37,7 +38,7 @@ export default function StudyDetailScreen() {
       setHiddenRects(Array(image.masks.length).fill(true));
     };
     fetchData();
-  }, []);
+  }, [studyId]);
 
   if (!imageData) {
     return (

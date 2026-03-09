@@ -4,11 +4,9 @@ import {
   Gesture,
   GestureDetector,
   GestureHandlerRootView,
-  TouchableOpacity,
 } from "react-native-gesture-handler";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { RectMask } from "@/types";
-import Svg, { Circle, Line, Rect, Text } from "react-native-svg";
+import Svg, { Circle, Line, Rect } from "react-native-svg";
 
 type Props = {
   imageUri: string;
