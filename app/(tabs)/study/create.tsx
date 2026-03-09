@@ -9,14 +9,14 @@ import {
 } from "react-native";
 import ImageMaskDrawer from "@/components/organisms/study/ImageMaskDrawer";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { NON_CUSTOMER_FLASH_CARD_KEY } from "@/constants";
-import { getValueFor, saveToLocalStorage } from "@/lib/storage";
+import { saveStudyItem } from "@/lib/study-items";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { RectMask } from "@/types";
 
 export default function CreateScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [maskedData, setMaskedData] = useState<any[]>([]);
+  const [maskedData, setMaskedData] = useState<RectMask[]>([]);
   // TODO: 会員: true。非会員: falseになるようにする
   const isRegisteredMember = true;
 
@@ -39,23 +39,17 @@ export default function CreateScreen() {
     if (!selectedImage) return;
 
     try {
-      // 既存データの取得
-      const storedData = await getValueFor(NON_CUSTOMER_FLASH_CARD_KEY);
-      let images = storedData ? JSON.parse(storedData) : [];
-
-      // 非会員は 1つだけ登録可能
-      if (!isRegisteredMember) {
-        images = [];
-      }
-
       const newImageData = {
         id: Date.now(),
         uri: selectedImage,
         masks: maskedData,
       };
 
-      images.push(newImageData);
-      saveToLocalStorage(NON_CUSTOMER_FLASH_CARD_KEY, JSON.stringify(images));
+      if (!isRegisteredMember) {
+        return;
+      }
+
+      await saveStudyItem(newImageData);
       setSelectedImage(null);
       setMaskedData([]);
       alert("画像を保存しました！");
