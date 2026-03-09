@@ -9,10 +9,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { NON_CUSTOMER_FLASH_CARD_KEY } from "@/constants";
 import { TImage } from "@/types";
 import MaskedBlocks from "@/components/organisms/study/MaskedBlocks";
-import { getValueFor } from "@/lib/storage";
+import { getStudyItemById } from "@/lib/study-items";
 
 export default function StudyDetailScreen() {
   const local = useLocalSearchParams();
@@ -27,13 +26,13 @@ export default function StudyDetailScreen() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const storedData = await getValueFor(NON_CUSTOMER_FLASH_CARD_KEY);
-      const images: TImage[] = storedData ? JSON.parse(storedData) : [];
-      const image = images.find((img) => img.id === Number(studyId)) ?? {
-        id: 0,
-        uri: "",
-        masks: [],
-      };
+      const image = await getStudyItemById(Number(studyId));
+      if (!image) {
+        setImageData({ id: 0, uri: "", masks: [] });
+        setHiddenRects([]);
+        return;
+      }
+
       setImageData(image);
       setHiddenRects(Array(image.masks.length).fill(true));
     };

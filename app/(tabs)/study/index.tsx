@@ -11,9 +11,8 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Link, useFocusEffect, useRouter } from "expo-router";
-import { NON_CUSTOMER_FLASH_CARD_KEY } from "@/constants";
 import { TImage } from "@/types";
-import { getValueFor, saveToLocalStorage } from "@/lib/storage";
+import { deleteStudyItemById, listStudyItems } from "@/lib/study-items";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function StudyListScreen() {
@@ -22,8 +21,7 @@ export default function StudyListScreen() {
   const router = useRouter(); // routerフックを使う
   const fetchImages = async () => {
     setIsLoading(true); // データ取得中の状態を管理
-    const storedData = await getValueFor(NON_CUSTOMER_FLASH_CARD_KEY);
-    const images = storedData ? JSON.parse(storedData) : [];
+    const images = await listStudyItems();
     setImageList(images);
     setIsLoading(false);
   };
@@ -32,10 +30,7 @@ export default function StudyListScreen() {
     const updatedImages = imageList.filter((item) => item.id !== id);
     setImageList(updatedImages); // JSスレッドで保持
     Alert.alert("削除しました");
-    await saveToLocalStorage(
-      NON_CUSTOMER_FLASH_CARD_KEY,
-      JSON.stringify(updatedImages)
-    ); // 永続化
+    await deleteStudyItemById(id);
   };
   // タブ遷移時にデータを取得する
   useFocusEffect(
